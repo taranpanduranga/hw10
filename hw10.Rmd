@@ -1,0 +1,50 @@
+---
+title: "hw10"
+author: "Taran Panduranga"
+date: "2023-04-26"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+accident <- read.csv("accident.csv")
+person <- read.csv("person.csv")
+head(accident)
+head(person)
+```
+
+
+```{r}
+accident_day <- accident %>% group_by(DAY_WEEK) %>% summarize(count = n())
+print(accident_day)
+
+accident_hour <- accident %>% group_by(HOUR) %>% summarize(count = n())
+print(accident_hour)
+
+accident_drunk <- accident %>% filter(DRUNK_DR >= 1)
+nrow(accident_drunk)
+```
+
+Looking at the data, the 7th day of the week is attrubuted with the most amount of accidents.
+The most accidents happen in the second hour. Lastly, there are 8720 accidents with at least one drunk driver.
+
+```{r}
+drivers <- person %>% filter(PER_TYP == 1)
+
+accident_drivers <- accident %>% left_join(drivers, by = "ST_CASE")
+
+summary <- accident_drivers %>% group_by(DAY_WEEK, HOUR.x, SEX) %>% tally()
+head(summary)
+
+
+ggplot(aes(x = HOUR.x, y = n, fill = SEX), data=summary) +
+  geom_col(position = "dodge") + 
+  facet_wrap(~ DAY_WEEK, scale = "free_y") + 
+  geom_point()
+
+```
+
+## R Markdown
+
+
